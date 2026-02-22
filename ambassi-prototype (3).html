@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ambassi — Espaço Zélos v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --orange:#F05A1A;--orange-lt:#FFF4EE;
+  --green:#2d9e6b;--green-lt:#edfaf4;
+  --teal:#0e7490;--teal-lt:#ecfeff;
+  --red:#dc2626;--red-lt:#fef2f2;
+  --ink:#111010;--cream:#ECEAE3;--cream2:#F4F2EC;--cream3:#E0DDD5;
+  --white:#fff;--muted:#7a7a76;--faint:#b8b6b0;--border:rgba(0,0,0,.07);
+  --sans:'Inter',system-ui,sans-serif;--serif:'Instrument Serif',Georgia,serif;
+  --shadow-sm:0 1px 3px rgba(0,0,0,.06);--shadow-md:0 4px 12px rgba(0,0,0,.08);
+}
+html,body{margin:0;padding:0;font-family:var(--sans);background:var(--cream);color:var(--ink);min-height:100vh;}
+
+/* ── SHELL ── */
+.shell{display:block;}
+
+/* ── SIDEBAR ── */
+.sidebar{
+  background:var(--ink);
+  padding:40px 16px 24px;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+  position:fixed;top:0;left:0;bottom:0;width:220px;z-index:10;
+}
+.s-logo{
+  font-family:var(--serif);font-style:italic;
+  font-size:20px;color:#fff;letter-spacing:-.01em;
+  margin-bottom:40px;padding:0 8px;
+}
+.s-logo span{color:var(--orange)}
+.s-sec{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.14em;color:rgba(255,255,255,.2);
+  padding:0 10px;margin-bottom:4px;margin-top:16px;
+}
+.s-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 10px;border-radius:10px;
+  font-size:13px;font-weight:500;color:rgba(255,255,255,.45);
+  cursor:pointer;position:relative;transition:all .15s;
+  user-select:none;margin-bottom:2px;
+}
+.s-item:hover{background:rgba(255,255,255,.04);color:rgba(255,255,255,.7)}
+.s-item.active{background:rgba(255,255,255,.08);color:#fff;font-weight:600}
+.s-item.active::before{
+  content:'';position:absolute;left:0;top:25%;bottom:25%;
+  width:3px;background:var(--orange);border-radius:0 2px 2px 0;
+}
+.s-badge{
+  margin-left:auto;background:var(--orange);color:#fff;
+  font-size:10px;font-weight:800;min-width:18px;height:18px;
+  border-radius:9px;display:flex;align-items:center;justify-content:center;
+  padding:0 5px;
+}
+.s-profile{
+  margin-top:auto;padding:12px;
+  background:rgba(255,255,255,.04);border-radius:10px;
+  display:flex;align-items:center;gap:10px;
+}
+.s-av{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--orange);display:flex;align-items:center;
+  justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0;
+}
+.s-name{font-size:12px;font-weight:600;color:#fff;line-height:1.2}
+.s-plan{font-size:10px;color:rgba(255,255,255,.3)}
+
+/* ── MAIN ── */
+.main{
+  margin-left:220px;
+  background:var(--cream);
+  min-height:100vh;
+}
+.page{display:none;padding:48px 40px 80px;min-height:100vh}
+.page.active{display:block}
+
+/* ── PAGE HEADER ── */
+.ph{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px}
+.ph-left{}
+.ph-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px}
+.ph-title{font-family:var(--serif);font-style:italic;font-size:36px;color:var(--ink);letter-spacing:-.02em;line-height:1.1}
+.ph-title em{color:var(--orange)}
+.ph-sub{font-size:13px;color:var(--muted);margin-top:4px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 18px;border-radius:999px;font-family:var(--sans);font-size:13px;font-weight:700;border:none;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:hover{background:#d44d14}
+.btn-secondary{background:var(--white);color:var(--ink);border:1.5px solid rgba(0,0,0,.12)}
+.btn-secondary:hover{background:var(--cream2)}
+.btn-ghost{background:transparent;color:var(--orange);padding:8px 14px}
+.btn-sm{padding:6px 14px;font-size:12px}
+.btn-approve{background:var(--green-lt);color:var(--green);border:none}
+.btn-approve:hover{background:#d4f5e5}
+.btn-review{background:var(--cream2);color:var(--muted);border:none}
+
+/* ── STATS GRID ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.sc{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:20px;box-shadow:var(--shadow-sm)}
+.sc.hero{background:var(--ink);border-color:transparent;box-shadow:var(--shadow-md)}
+.sc-num{font-family:var(--serif);font-style:italic;font-size:28px;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.sc.hero .sc-num{color:var(--orange);font-size:32px}
+.sc-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-top:5px}
+.sc.hero .sc-label{color:rgba(255,255,255,.8)}
+.sc-delta{font-size:11px;font-weight:700;color:var(--green);margin-top:6px}
+.sc.hero .sc-delta{color:rgba(255,255,255,.4);font-weight:500}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow-sm)}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink);letter-spacing:-.01em}
+.card-body{padding:0}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:0;background:var(--cream2);border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content}
+.tab{padding:7px 16px;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+.tab.active{background:var(--white);color:var(--ink);box-shadow:var(--shadow-sm)}
+
+/* ── TABLE ── */
+.table{width:100%;border-collapse:collapse}
+.table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);padding:10px 20px;text-align:left;background:var(--cream2);border-bottom:1px solid var(--border)}
+.table td{padding:14px 20px;border-bottom:1px solid rgba(0,0,0,.04);font-size:13px;color:var(--ink);vertical-align:middle}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:rgba(0,0,0,.01)}
+
+/* ── TAGS ── */
+.tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:4px}
+.tag-green{background:var(--green-lt);color:var(--green)}
+.tag-orange{background:var(--orange-lt);color:var(--orange)}
+.tag-red{background:var(--red-lt);color:var(--red)}
+.tag-neutral{background:var(--cream2);color:var(--muted)}
+.tag-teal{background:var(--teal-lt);color:var(--teal)}
+
+/* ── AVATAR ── */
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.av-sm{width:26px;height:26px;font-size:9px}
+
+/* ── FEED ITEM ── */
+.feed-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 20px;border-bottom:1px solid rgba(0,0,0,.04);
+}
+.feed-item:last-child{border-bottom:none}
+.fi-name{font-size:13px;font-weight:600;color:var(--ink)}
+.fi-sub{font-size:12px;color:var(--muted);margin-top:1px}
+
+/* ── TWO COL ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+/* ── REWARD CARD ── */
+.reward-card{
+  background:var(--white);border:1px solid var(--border);
+  border-radius:16px;padding:20px;box-shadow:var(--shadow-sm);
+}
+.rc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.rc-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.rc-desc{font-size:12px;color:var(--muted);line-height:1.5;margin-bottom:14px}
+.rc-badge{display:inline-flex;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}
+
+/* ── SETTINGS ── */
+.setting-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 0;border-bottom:1px solid var(--border);
+}
+.setting-row:last-child{border-bottom:none}
+.sr-left{}
+.sr-label{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.sr-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.toggle{
+  width:42px;height:24px;border-radius:12px;
+  background:var(--green);position:relative;cursor:pointer;flex-shrink:0;
+  transition:background .2s;
+}
+.toggle.off{background:var(--cream3)}
+.toggle::after{
+  content:'';position:absolute;
+  top:3px;left:3px;width:18px;height:18px;
+  border-radius:50%;background:#fff;
+  transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2);
+}
+.toggle.off::after{transform:none}
+.toggle:not(.off)::after{transform:translateX(18px)}
+
+/* ── INPUT ── */
+.field{margin-bottom:16px}
+.field-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+.input{
+  width:100%;padding:10px 14px;border-radius:10px;
+  font-family:var(--sans);font-size:13px;color:var(--ink);
+  border:1.5px solid rgba(0,0,0,.12);background:var(--white);outline:none;
+}
+.input:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(240,90,26,.1)}
+.input-group{display:flex;align-items:center;border:1.5px solid rgba(0,0,0,.12);border-radius:10px;overflow:hidden;background:var(--white)}
+.ig-prefix{padding:10px 14px;font-size:13px;color:var(--muted);background:var(--cream2);border-right:1px solid rgba(0,0,0,.1);white-space:nowrap}
+.ig-input{flex:1;padding:10px 14px;font-family:var(--sans);font-size:13px;color:var(--ink);border:none;outline:none;background:transparent}
+
+/* ── CHART PLACEHOLDER ── */
+.chart-wrap{height:180px;background:var(--cream2);border-radius:12px;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:16px;gap:6px}
+.bar{border-radius:4px 4px 0 0;flex:1;background:var(--orange);opacity:.2;transition:opacity .2s}
+.bar.active{opacity:1}
+.bar:hover{opacity:.7}
+.chart-line{position:absolute;inset:16px;pointer-events:none}
+
+/* ── MINI STAT ── */
+.mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.ms{background:var(--white);border:1px solid var(--border);border-radius:14px;padding:16px}
+.ms-num{font-family:var(--serif);font-style:italic;font-size:24px;color:var(--ink);line-height:1;letter-spacing:-.02em}
+.ms-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);margin-top:4px}
+.ms-delta{font-size:11px;font-weight:700;color:var(--green);margin-top:5px}
+
+/* ── SECTION TITLE ── */
+.sec-title{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--ink);letter-spacing:-.01em;margin-bottom:14px}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:48px 24px;color:var(--muted)}
+.empty-icon{font-size:32px;margin-bottom:12px;opacity:.3}
+.empty-text{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--muted)}
+
+/* ── FILTER ROW ── */
+.filter-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.filter-tag{
+  padding:6px 14px;border-radius:999px;font-size:12px;font-weight:600;
+  border:1.5px solid rgba(0,0,0,.1);background:var(--white);color:var(--muted);
+  cursor:pointer;transition:all .15s;
+}
+.filter-tag.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filter-search{
+  margin-left:auto;padding:7px 14px;border-radius:999px;
+  border:1.5px solid rgba(0,0,0,.1);background:var(--white);
+  font-family:var(--sans);font-size:12.5px;color:var(--ink);
+  outline:none;min-width:180px;
+}
+.filter-search:focus{border-color:var(--orange)}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap{height:6px;background:var(--cream2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;background:var(--orange)}
+
+
+
+
+/* ── MODAL ── */
+.recomp-type-btn{border:1.5px solid var(--border);border-radius:10px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;background:var(--white)}
+.recomp-type-btn:hover{border-color:var(--orange);background:var(--orange-lt)}
+.recomp-type-btn.active{border-color:var(--orange);background:var(--orange-lt);color:var(--orange)}
+
+/* ── CONFIG ── */
+.cfg-nav-item{padding:12px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:1px solid var(--border);transition:all .15s}
+.cfg-nav-item:last-child{border-bottom:none}
+.cfg-nav-item:hover{background:var(--cream2);color:var(--ink)}
+.cfg-nav-item.active{background:var(--cream2);color:var(--ink);font-weight:700}
+.cfg-row{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border);gap:24px}
+.cfg-row-left{flex:1}
+.cfg-row-label{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:3px}
+.cfg-row-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* ── DRAWER ── */
+.drawer-head{padding:28px 28px 20px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between}
+.drawer-close{width:32px;height:32px;border-radius:50%;background:var(--cream2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:16px;color:var(--muted);transition:background .15s}
+.drawer-close:hover{background:var(--cream3)}
+.drawer-section{padding:20px 28px;border-bottom:1px solid var(--border)}
+.drawer-section:last-child{border-bottom:none}
+.drawer-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);margin-bottom:12px}
+.drawer-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:0}
+.drawer-stat{background:var(--cream2);border-radius:10px;padding:12px 14px}
+.drawer-stat-num{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--ink);line-height:1}
+.drawer-stat-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:3px}
+.hist-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.04)}
+.hist-item:last-child{border-bottom:none}
+
+/* ── NOTIF ── */
+.notif-item{display:flex;gap:12px;padding:14px 18px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s}
+.notif-item:last-child{border-bottom:none}
+.notif-item:hover{background:var(--cream2)}
+.notif-item.unread{background:rgba(240,90,26,.03)}
+
+/* ── DIVIDER ── */
+.divider{height:1px;background:var(--border);margin:24px 0}
+</style>
+</head>
+<body>
+<div class="shell">
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar">
+  <div class="s-logo">ambassi<span>.</span></div>
+
+  <div class="s-sec">Principal</div>
+  <div class="s-item active" onclick="nav('inicio',this)">
+    <svg width="15" height="15" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="2" width="7" height="7" rx="2"/><rect x="13" y="2" width="7" height="7" rx="2"/><rect x="2" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/></svg>
+    Início
+  </div>
+  <div class="s-item" onclick="nav('aprovacoes',this)">
+    <svg width="15" height="15" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4" width="18" height="14" rx="2.5"/><path d="M7 10h4M7 13h3" stroke-linecap="round"/></svg>
+    Aprovações
+    <span class="s-badge">5</span>
+  </div>
+  <div class="s-item" onclick="nav('alunos',this)">
+    <svg width="15" height="15" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="8" r="3.5"/><path d="M3.5 19c0-4.7 3.4-7 7.5-7s7.5 2.3 7.5 7" stroke-linecap="round"/></svg>
+    Alunos
+  </div>
+
+  <div class="s-sec">Análise</div>
+  <div class="s-item" onclick="nav('analytics',this)">
+    <svg width="15" height="15" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 16l4-4 3 3 4-5 3 2" stroke-linecap="round" stroke-linejoin="round"/><rect x="2" y="2" width="18" height="18" rx="3"/></svg>
+    Analytics
+  </div>
+  <div class="s-item" onclick="nav('recompensas',this)">
+    <svg width="15" height="15" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="7" height="5" rx="1.5"/><rect x="3" y="12" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="5" height="16" rx="1.5"/></svg>
+    Recompensas
+  </div>
+
+  <div class="s-sec">Conta</div>
+  <div class="s-item" onclick="nav('configuracoes',this)">
+    <svg width="15" height="15" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="3"/><path d="M11 2v2M11 18v2M2 11h2M18 11h2M4.9 4.9l1.4 1.4M15.7 15.7l1.4 1.4M4.9 17.1l1.4-1.4M15.7 6.3l1.4-1.4" stroke-linecap="round"/></svg>
+    Configurações
+  </div>
+
+  <div class="s-profile">
+    <div class="s-av">EZ</div>
+    <div>
+      <div class="s-name">Espaço Zélos</div>
+      <div class="s-plan">Plano Pro</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ INÍCIO ══ -->
+<div class="main">
+
+<div class="page active" id="page-inicio">
+
+  <!-- HEADER -->
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-label" id="data-hoje"></div>
+      <div class="ph-title">Boa tarde, <em>Espaço Zélos.</em></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="tabs" style="margin-bottom:0" id="period-tabs">
+        <div class="tab active" onclick="setPeriod('mes',this)">Este mês</div>
+        <div class="tab" onclick="setPeriod('ano',this)">Este ano</div>
+        <div class="tab" onclick="setPeriod('historico',this)">Desde o início</div>
+      </div>
+      <div style="position:relative;flex-shrink:0" id="bell-wrap">
+        <div style="width:40px;height:40px;border-radius:50%;background:var(--white);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);cursor:pointer" onclick="toggleNotif(event)">
+          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="var(--ink)" stroke-width="1.6"><path d="M18 16H4l2-4V9a5 5 0 0110 0v3l2 4z" stroke-linejoin="round"/><path d="M13 19a2 2 0 01-4 0"/></svg>
+        </div>
+        <div style="position:absolute;top:-3px;right:-3px;width:18px;height:18px;background:var(--orange);border-radius:50%;border:2px solid var(--cream);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;pointer-events:none">5</div>
+        <div id="notif-dropdown" style="display:none;position:absolute;top:50px;right:0;width:320px;background:var(--white);border:1px solid var(--border);border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);z-index:999;overflow:hidden">
+          <div style="padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:13px;font-weight:700;color:var(--ink)">Notificações</span>
+            <span style="font-size:11px;font-weight:700;color:var(--orange);cursor:pointer" onclick="marcarTodasLidas()">Marcar todas como lidas</span>
+          </div>
+          <div class="notif-item unread" onclick="nav('aprovacoes', document.querySelectorAll('.s-item')[1]);toggleNotif()">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:3px"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--ink)">5 aprovações pendentes</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Desde terça. Aprovar rápido aumenta novas indicações.</div>
+              <div style="font-size:11px;color:var(--faint);margin-top:4px">Hoje, 09:00</div>
+            </div>
+          </div>
+          <div class="notif-item unread" onclick="nav('inicio', document.querySelectorAll('.s-item')[0]);toggleNotif()">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:3px"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--ink)">Emma Miller converteu Sophie Ward</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Novo aluno via indicação. Pacote mensal.</div>
+              <div style="font-size:11px;color:var(--faint);margin-top:4px">Hoje, 14:23</div>
+            </div>
+          </div>
+          <div class="notif-item unread" onclick="nav('recompensas', document.querySelectorAll('.s-item')[4]);toggleNotif()">
+            <div style="width:8px;height:8px;border-radius:50%;background:var(--orange);flex-shrink:0;margin-top:3px"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--ink)">Recompensa da Ana Lima pendente</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">1 aula grátis aguardando pagamento.</div>
+              <div style="font-size:11px;color:var(--faint);margin-top:4px">Ontem, 09:12</div>
+            </div>
+          </div>
+          <div class="notif-item" onclick="nav('alunos', document.querySelectorAll('.s-item')[2]);toggleNotif()">
+            <div style="width:8px;height:8px;border-radius:50%;background:transparent;flex-shrink:0;margin-top:3px"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--ink)">Sarah Chen está em 2ª lugar esse mês</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">67% de conversão. Considere reconhecê-la também.</div>
+              <div style="font-size:11px;color:var(--faint);margin-top:4px">17 fev, 11:00</div>
+            </div>
+          </div>
+          <div class="notif-item" onclick="nav('analytics', document.querySelectorAll('.s-item')[3]);toggleNotif()">
+            <div style="width:8px;height:8px;border-radius:50%;background:transparent;flex-shrink:0;margin-top:3px"></div>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:600;color:var(--ink)">Conversão subiu 5pts em fevereiro</div>
+              <div style="font-size:12px;color:var(--muted);margin-top:2px">Melhor resultado desde que o programa começou.</div>
+              <div style="font-size:11px;color:var(--faint);margin-top:4px">16 fev, 08:00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO CARD -->
+  <div style="background:var(--ink);border-radius:20px;padding:24px 28px;margin-bottom:16px;display:flex;align-items:center;gap:0">
+    <div style="flex:1;min-width:0;padding-right:32px">
+      <div id="hero-period-label" style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:rgba(255,255,255,.3);margin-bottom:6px">Fevereiro 2026</div>
+      <div style="display:flex;align-items:baseline;gap:10px">
+        <span id="hero-num" style="font-family:var(--serif);font-style:italic;font-size:48px;color:var(--orange);line-height:1;letter-spacing:-.02em">12</span>
+        <span style="font-size:15px;color:rgba(255,255,255,.6);font-weight:500">novos alunos via indicação</span>
+      </div>
+      <div style="font-size:13px;color:rgba(255,255,255,.4);margin-top:5px">Isso representa <span id="hero-receita" style="color:#fff;font-weight:600">R$4.800 em receita nova</span> sem anúncio e sem agência.</div>
+    </div>
+    <div style="width:1px;align-self:stretch;background:rgba(255,255,255,.08);flex-shrink:0;margin:0 28px"></div>
+    <div style="display:flex;gap:12px;flex-shrink:0">
+      <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:14px 20px;text-align:center;min-width:90px">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:4px">Conversão</div>
+        <div id="hero-conversao" style="font-family:var(--serif);font-style:italic;font-size:26px;color:#fff;line-height:1">68%</div>
+        <div id="hero-conv-delta" style="font-size:11px;color:var(--green);font-weight:700;margin-top:4px">↑ +5pts</div>
+      </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:14px 20px;text-align:center;min-width:90px">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:4px">Indicações</div>
+        <div id="hero-indicacoes" style="font-family:var(--serif);font-style:italic;font-size:26px;color:#fff;line-height:1">142</div>
+        <div id="hero-ind-delta" style="font-size:11px;color:var(--green);font-weight:700;margin-top:4px">↑ +24%</div>
+      </div>
+      <div style="background:rgba(255,255,255,.06);border-radius:12px;padding:14px 20px;text-align:center;min-width:90px">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:4px">Embaixadores</div>
+        <div id="hero-embaixadores" style="font-family:var(--serif);font-style:italic;font-size:26px;color:#fff;line-height:1">12</div>
+        <div id="hero-emb-delta" style="font-size:11px;color:var(--green);font-weight:700;margin-top:4px">↑ +3 novos</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TRÊS COLUNAS -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;align-items:stretch">
+
+    <div style="display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div class="sec-title" style="margin-bottom:0">Aprovar agora</div>
+        <span class="tag tag-orange" style="cursor:pointer" onclick="nav('aprovacoes', document.querySelectorAll('.s-item')[1])">5 pendentes</span>
+      </div>
+      <div class="card" style="border-color:rgba(240,90,26,.2);flex:1;display:flex;flex-direction:column">
+        <div style="flex:1">
+          <div class="feed-item">
+            <div style="flex:1"><div class="fi-name">Sophie Ward</div><div class="fi-sub">por Emma · pacote mensal</div></div>
+            <button class="btn btn-approve btn-sm" onclick="aprovarHome(this)">Aprovar</button>
+          </div>
+          <div class="feed-item">
+            <div style="flex:1"><div class="fi-name">Mike Ross</div><div class="fi-sub">por James · aula avulsa</div></div>
+            <button class="btn btn-approve btn-sm" onclick="aprovarHome(this)">Aprovar</button>
+          </div>
+          <div class="feed-item">
+            <div style="flex:1"><div class="fi-name">Fernanda Costa</div><div class="fi-sub">por Paula · pacote trimestral</div></div>
+            <button class="btn btn-approve btn-sm" onclick="aprovarHome(this)">Aprovar</button>
+          </div>
+          <div class="feed-item">
+            <div style="flex:1"><div class="fi-name">Rafael Souza</div><div class="fi-sub">por Sarah · pacote mensal</div></div>
+            <button class="btn btn-approve btn-sm" onclick="aprovarHome(this)">Aprovar</button>
+          </div>
+          <div class="feed-item">
+            <div style="flex:1"><div class="fi-name">Beatriz Alves</div><div class="fi-sub">por Ana · aula avulsa</div></div>
+            <button class="btn btn-approve btn-sm" onclick="aprovarHome(this)">Aprovar</button>
+          </div>
+        </div>
+        <div style="padding:12px 20px;background:var(--cream2);border-top:1px solid var(--border)">
+          <span onclick="nav('aprovacoes', document.querySelectorAll('.s-item')[1])" style="font-size:12px;font-weight:700;color:var(--orange);cursor:pointer">Ver todas as 5 aprovações →</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column">
+      <div style="margin-bottom:12px">
+        <div class="sec-title" style="margin-bottom:0">Reconhecer</div>
+      </div>
+      <div class="card" style="flex:1;display:flex;flex-direction:column">
+        <div style="padding:20px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,rgba(240,90,26,.04) 0%,transparent 100%)">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+            <div class="av" style="background:var(--orange);width:40px;height:40px;font-size:12px">EM</div>
+            <div>
+              <div style="font-size:14px;font-weight:700;color:var(--ink)">Emma Miller</div>
+              <div style="font-size:11px;color:var(--muted)" id="top-period-label">Melhor embaixador do mês</div>
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--ink);line-height:1.6;margin-bottom:12px"><span id="top-stats" style="font-weight:700;color:var(--orange)">14 indicações, 9 convertidas.</span> Vale criar uma recompensa especial pra esse embaixador.</div>
+          <button class="btn btn-primary btn-sm" style="width:100%;justify-content:center" onclick="nav('recompensas', document.querySelectorAll('.s-item')[4])">Criar recompensa para Emma</button>
+        </div>
+        <div style="flex:1">
+          <div class="feed-item" style="padding:12px 20px">
+            <div class="av av-sm" style="background:var(--teal)">SC</div>
+            <div style="flex:1"><div class="fi-name" style="cursor:pointer;color:var(--orange)" onclick="openAluna('sarah')">Sarah Chen</div><div class="fi-sub" id="sarah-stats">9 indicações · 6 conversões</div></div>
+            <span class="tag tag-green">67%</span>
+          </div>
+          <div class="feed-item" style="padding:12px 20px">
+            <div class="av av-sm" style="background:var(--green)">AL</div>
+            <div style="flex:1"><div class="fi-name" style="cursor:pointer;color:var(--orange)" onclick="openAluna('ana')">Ana Lima</div><div class="fi-sub" id="ana-stats">7 indicações · 5 conversões</div></div>
+            <span class="tag tag-green">71%</span>
+          </div>
+        </div>
+        <div style="padding:12px 20px;background:var(--cream2);border-top:1px solid var(--border)">
+          <span onclick="nav('alunos', document.querySelectorAll('.s-item')[2])" style="font-size:12px;font-weight:700;color:var(--orange);cursor:pointer">Ver todos os embaixadores →</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column">
+      <div style="margin-bottom:12px">
+        <div class="sec-title" style="margin-bottom:0">Atividade recente</div>
+      </div>
+      <div class="card" style="flex:1;display:flex;flex-direction:column">
+        <div style="flex:1">
+          <div class="feed-item">
+            <div class="av av-sm" style="background:var(--orange)">EM</div>
+            <div style="flex:1"><div class="fi-name" style="cursor:pointer;color:var(--orange)" onclick="openAluna('emma')">Emma Miller</div><div class="fi-sub">Converteu Sophie Ward · 2 min</div></div>
+            <span class="tag tag-green">Convertida</span>
+          </div>
+          <div class="feed-item">
+            <div class="av av-sm" style="background:var(--teal)">SC</div>
+            <div style="flex:1"><div class="fi-name" style="cursor:pointer;color:var(--orange)" onclick="openAluna('sarah')">Sarah Chen</div><div class="fi-sub">Compartilhou o link · 18 min</div></div>
+            <span class="tag tag-orange">Pendente</span>
+          </div>
+          <div class="feed-item">
+            <div class="av av-sm" style="background:#7c3aed">AL</div>
+            <div style="flex:1"><div class="fi-name" style="cursor:pointer;color:var(--orange)" onclick="openAluna('ana')">Ana Lima</div><div class="fi-sub">Converteu Carla Dias · 3 h</div></div>
+            <span class="tag tag-green">Convertida</span>
+          </div>
+          <div class="feed-item">
+            <div class="av av-sm" style="background:#e11d48">PR</div>
+            <div style="flex:1"><div class="fi-name" style="cursor:pointer;color:var(--orange)" onclick="openAluna('paula')">Paula Rocha</div><div class="fi-sub">Indicou Fernanda Costa · 5 h</div></div>
+            <span class="tag tag-orange">Pendente</span>
+          </div>
+          <div class="feed-item">
+            <div class="av av-sm" style="background:var(--green)">MF</div>
+            <div style="flex:1"><div class="fi-name">Mariana Faria</div><div class="fi-sub">Converteu Julia Neves · ontem</div></div>
+            <span class="tag tag-green">Convertida</span>
+          </div>
+        </div>
+        <div style="padding:12px 20px;background:var(--cream2);border-top:1px solid var(--border)">
+          <span onclick="nav('alunos', document.querySelectorAll('.s-item')[2])" style="font-size:12px;font-weight:700;color:var(--orange);cursor:pointer">Ver toda a atividade →</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- ══════════════════════ APROVAÇÕES ══ -->
+<div class="page" id="page-aprovacoes">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-label">Aprovações</div>
+      <div class="ph-title">5 <em>pendentes.</em></div>
+      <div class="ph-sub">Aprovar em menos de 24 horas aumenta a chance de novas indicações.</div>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <div id="mass-actions" style="display:none;align-items:center;gap:8px">
+        <span id="sel-count" style="font-size:12px;font-weight:600;color:var(--muted)">0 selecionadas</span>
+        <button class="btn btn-approve btn-sm" onclick="aprovarSelecionadas()">Aprovar selecionadas</button>
+        <button class="btn btn-review btn-sm" onclick="recusarSelecionadas()">Recusar selecionadas</button>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="aprovarTodas()">Aprovar todas</button>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <div class="filter-tag active" onclick="filtrarAprov('todas',this)">Todas (12)</div>
+    <div class="filter-tag" onclick="filtrarAprov('pendente',this)">Pendentes (5)</div>
+    <div class="filter-tag" onclick="filtrarAprov('aprovada',this)">Aprovadas (6)</div>
+    <div class="filter-tag" onclick="filtrarAprov('recusada',this)">Recusadas (1)</div>
+    <input class="filter-search" placeholder="Buscar por nome ou embaixadora..." type="text" oninput="buscarAprov(this.value)">
+  </div>
+
+  <div class="card">
+    <table class="table" id="tabela-aprovacoes">
+      <thead>
+        <tr>
+          <th style="width:36px"><input type="checkbox" id="check-all" onchange="toggleAll(this)" style="cursor:pointer;width:14px;height:14px;accent-color:var(--orange)"></th>
+          <th>Indicada</th>
+          <th>Embaixador</th>
+          <th>Pacote</th>
+          <th>Data</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-status="pendente">
+          <td><input type="checkbox" class="row-check" onchange="updateSelection()" style="cursor:pointer;width:14px;height:14px;accent-color:var(--orange)"></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:#e11d48">SW</div>
+              <div><div style="font-weight:600">Sophie Ward</div><div style="font-size:11px;color:var(--muted)">sophie@email.com</div></div>
+            </div>
+          </td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--orange)">EM</div>Emma Miller</div></td>
+          <td><span style="font-size:13px">Pacote mensal</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">Hoje, 14:23</span></td>
+          <td><span class="tag tag-orange row-status">Pendente</span></td>
+          <td><div style="display:flex;gap:6px">
+            <button class="btn btn-approve btn-sm" onclick="aprovar(this)">Aprovar</button>
+            <button class="btn btn-review btn-sm" onclick="revisar(this)">Revisar</button>
+            <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="recusar(this)">Recusar</button>
+          </div></td>
+        </tr>
+        <tr data-status="pendente">
+          <td><input type="checkbox" class="row-check" onchange="updateSelection()" style="cursor:pointer;width:14px;height:14px;accent-color:var(--orange)"></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:#0ea5e9">MR</div>
+              <div><div style="font-weight:600">Mike Ross</div><div style="font-size:11px;color:var(--muted)">mike@email.com</div></div>
+            </div>
+          </td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:#7c3aed">JD</div>James Donovan</div></td>
+          <td><span style="font-size:13px">Aula avulsa</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">Hoje, 11:05</span></td>
+          <td><span class="tag tag-orange row-status">Pendente</span></td>
+          <td><div style="display:flex;gap:6px">
+            <button class="btn btn-approve btn-sm" onclick="aprovar(this)">Aprovar</button>
+            <button class="btn btn-review btn-sm" onclick="revisar(this)">Revisar</button>
+            <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="recusar(this)">Recusar</button>
+          </div></td>
+        </tr>
+        <tr data-status="pendente">
+          <td><input type="checkbox" class="row-check" onchange="updateSelection()" style="cursor:pointer;width:14px;height:14px;accent-color:var(--orange)"></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:#f59e0b">FC</div>
+              <div><div style="font-weight:600">Fernanda Costa</div><div style="font-size:11px;color:var(--muted)">fer@email.com</div></div>
+            </div>
+          </td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:#e11d48">PR</div>Paula Rocha</div></td>
+          <td><span style="font-size:13px">Pacote trimestral</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">Ontem, 16:40</span></td>
+          <td><span class="tag tag-orange row-status">Pendente</span></td>
+          <td><div style="display:flex;gap:6px">
+            <button class="btn btn-approve btn-sm" onclick="aprovar(this)">Aprovar</button>
+            <button class="btn btn-review btn-sm" onclick="revisar(this)">Revisar</button>
+            <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="recusar(this)">Recusar</button>
+          </div></td>
+        </tr>
+        <tr data-status="pendente">
+          <td><input type="checkbox" class="row-check" onchange="updateSelection()" style="cursor:pointer;width:14px;height:14px;accent-color:var(--orange)"></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:#7c3aed">BA</div>
+              <div><div style="font-weight:600">Beatriz Alves</div><div style="font-size:11px;color:var(--muted)">bia@email.com</div></div>
+            </div>
+          </td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--green)">AL</div>Ana Lima</div></td>
+          <td><span style="font-size:13px">Aula avulsa</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">Ontem, 10:20</span></td>
+          <td><span class="tag tag-orange row-status">Pendente</span></td>
+          <td><div style="display:flex;gap:6px">
+            <button class="btn btn-approve btn-sm" onclick="aprovar(this)">Aprovar</button>
+            <button class="btn btn-review btn-sm" onclick="revisar(this)">Revisar</button>
+            <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="recusar(this)">Recusar</button>
+          </div></td>
+        </tr>
+        <tr data-status="pendente">
+          <td><input type="checkbox" class="row-check" onchange="updateSelection()" style="cursor:pointer;width:14px;height:14px;accent-color:var(--orange)"></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:#0ea5e9">RS</div>
+              <div><div style="font-weight:600">Rafael Souza</div><div style="font-size:11px;color:var(--muted)">rafael@email.com</div></div>
+            </div>
+          </td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--teal)">SC</div>Sarah Chen</div></td>
+          <td><span style="font-size:13px">Pacote mensal</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">17 fev, 09:00</span></td>
+          <td><span class="tag tag-orange row-status">Pendente</span></td>
+          <td><div style="display:flex;gap:6px">
+            <button class="btn btn-approve btn-sm" onclick="aprovar(this)">Aprovar</button>
+            <button class="btn btn-review btn-sm" onclick="revisar(this)">Revisar</button>
+            <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="recusar(this)">Recusar</button>
+          </div></td>
+        </tr>
+        <tr data-status="aprovada">
+          <td><input type="checkbox" class="row-check" onchange="updateSelection()" style="cursor:pointer;width:14px;height:14px;accent-color:var(--orange)"></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:var(--green)">CD</div>
+              <div><div style="font-weight:600">Carla Dias</div><div style="font-size:11px;color:var(--muted)">carla@email.com</div></div>
+            </div>
+          </td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--green)">AL</div>Ana Lima</div></td>
+          <td><span style="font-size:13px">Pacote mensal</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">Ontem, 09:12</span></td>
+          <td><span class="tag tag-green row-status">Aprovada</span></td>
+          <td><span style="font-size:12px;color:var(--faint)">Recompensa paga</span></td>
+        </tr>
+        <tr data-status="aprovada">
+          <td><input type="checkbox" class="row-check" onchange="updateSelection()" style="cursor:pointer;width:14px;height:14px;accent-color:var(--orange)"></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:var(--teal)">JN</div>
+              <div><div style="font-weight:600">Julia Neves</div><div style="font-size:11px;color:var(--muted)">julia@email.com</div></div>
+            </div>
+          </td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--green)">MF</div>Mariana Faria</div></td>
+          <td><span style="font-size:13px">Aula avulsa</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">17 fev, 15:30</span></td>
+          <td><span class="tag tag-green row-status">Aprovada</span></td>
+          <td><span style="font-size:12px;color:var(--faint)">Recompensa paga</span></td>
+        </tr>
+        <tr data-status="recusada">
+          <td><input type="checkbox" class="row-check" onchange="updateSelection()" style="cursor:pointer;width:14px;height:14px;accent-color:var(--orange)"></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:var(--faint)">TS</div>
+              <div><div style="font-weight:600">Tom Silva</div><div style="font-size:11px;color:var(--muted)">tom@email.com</div></div>
+            </div>
+          </td>
+          <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--orange)">EM</div>Emma Miller</div></td>
+          <td><span style="font-size:13px">Pacote mensal</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">15 fev</span></td>
+          <td><span class="tag tag-red row-status">Recusada</span></td>
+          <td><span style="font-size:12px;color:var(--faint)">Duplicata</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════ ALUNOS ══ -->
+<div class="page" id="page-alunos">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-label">Alunos</div>
+      <div class="ph-title"><em>Embaixadores</em> de Espaço Zélos.</div>
+      <div class="ph-sub">12 ativos este mês. Emma está no topo pelo segundo mês seguido.</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="showToast('Link de convite copiado! Cole no WhatsApp ou e-mail da aluna.')">
+      <svg width="13" height="13" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5v12M5 11h12" stroke-linecap="round"/></svg>
+      Convidar embaixador
+    </button>
+  </div>
+
+  <div class="mini-stats">
+    <div class="ms">
+      <div class="ms-num">12</div>
+      <div class="ms-label">Embaixadores ativos</div>
+      <div class="ms-delta">↑ +3 este mês</div>
+    </div>
+    <div class="ms">
+      <div class="ms-num">142</div>
+      <div class="ms-label">Indicações no mês</div>
+      <div class="ms-delta">↑ +24%</div>
+    </div>
+    <div class="ms">
+      <div class="ms-num">R$1.860</div>
+      <div class="ms-label">Recompensas pagas</div>
+      <div class="ms-delta" style="color:var(--muted);font-weight:500">Acumulado</div>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <div class="filter-tag active">Todas</div>
+    <div class="filter-tag">Ativos</div>
+    <div class="filter-tag">Inativos</div>
+    <div class="filter-tag">Convidados</div>
+    <input class="filter-search" placeholder="Buscar embaixador..." type="text">
+  </div>
+
+  <div class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Embaixador</th>
+          <th>Indicações</th>
+          <th>Convertidas</th>
+          <th>Conversão</th>
+          <th>Recompensas</th>
+          <th>Última atividade</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:var(--orange)">EM</div>
+              <div>
+                <div style="font-weight:600;color:var(--orange);cursor:pointer" onclick="openAluna('emma')">Emma Miller <span style="font-size:10px;font-weight:500;color:var(--orange)">ver perfil →</span></div>
+                <div style="font-size:11px;color:var(--muted)">emma@email.com</div>
+              </div>
+            </div>
+          </td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink)">14</span></td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink)">9</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="prog-wrap" style="width:60px"><div class="prog-fill" style="width:64%"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--green)">64%</span>
+            </div>
+          </td>
+          <td><span style="font-size:13px;font-weight:600">R$450</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">Hoje, 14:23</span></td>
+          <td><span class="tag tag-teal">Ativo</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:var(--teal)">SC</div>
+              <div>
+                <div style="font-weight:600;color:var(--orange);cursor:pointer" onclick="openAluna('sarah')">Sarah Chen <span style="font-size:10px;font-weight:500;color:var(--orange)">ver perfil →</span></div>
+                <div style="font-size:11px;color:var(--muted)">sarah@email.com</div>
+              </div>
+            </div>
+          </td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink)">9</span></td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink)">6</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="prog-wrap" style="width:60px"><div class="prog-fill" style="width:67%"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--green)">67%</span>
+            </div>
+          </td>
+          <td><span style="font-size:13px;font-weight:600">R$300</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">Hoje, 11:18</span></td>
+          <td><span class="tag tag-teal">Ativo</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:var(--green)">AL</div>
+              <div>
+                <div style="font-weight:600;color:var(--orange);cursor:pointer" onclick="openAluna('ana')">Ana Lima <span style="font-size:10px;font-weight:500;color:var(--orange)">ver perfil →</span></div>
+                <div style="font-size:11px;color:var(--muted)">ana@email.com</div>
+              </div>
+            </div>
+          </td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink)">7</span></td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink)">5</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="prog-wrap" style="width:60px"><div class="prog-fill" style="width:71%"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--green)">71%</span>
+            </div>
+          </td>
+          <td><span style="font-size:13px;font-weight:600">R$250</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">Ontem, 09:12</span></td>
+          <td><span class="tag tag-teal">Ativo</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:#e11d48">PR</div>
+              <div>
+                <div style="font-weight:600;color:var(--orange);cursor:pointer" onclick="openAluna('paula')">Paula Rocha <span style="font-size:10px;font-weight:500;color:var(--orange)">ver perfil →</span></div>
+                <div style="font-size:11px;color:var(--muted)">paula@email.com</div>
+              </div>
+            </div>
+          </td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink)">4</span></td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink)">2</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="prog-wrap" style="width:60px"><div class="prog-fill" style="width:50%"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--muted)">50%</span>
+            </div>
+          </td>
+          <td><span style="font-size:13px;font-weight:600">R$100</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">Ontem, 16:40</span></td>
+          <td><span class="tag tag-teal">Ativo</span></td>
+        </tr>
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:10px">
+              <div class="av av-sm" style="background:var(--faint)">LM</div>
+              <div>
+                <div style="font-weight:600;color:var(--orange);cursor:pointer" onclick="openAluna('lucia')">Lucia Mendes <span style="font-size:10px;font-weight:500;color:var(--orange)">ver perfil →</span></div>
+                <div style="font-size:11px;color:var(--muted)">lucia@email.com</div>
+              </div>
+            </div>
+          </td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--muted)">1</span></td>
+          <td><span style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--muted)">0</span></td>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="prog-wrap" style="width:60px"><div class="prog-fill" style="width:0%;background:var(--faint)"></div></div>
+              <span style="font-size:12px;font-weight:700;color:var(--faint)">0%</span>
+            </div>
+          </td>
+          <td><span style="font-size:13px;color:var(--muted)">R$0</span></td>
+          <td><span style="font-size:12px;color:var(--muted)">12 fev</span></td>
+          <td><span class="tag tag-neutral">Inativo</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══════════════════════ ANALYTICS ══ -->
+<div class="page" id="page-analytics">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-label">Analytics</div>
+      <div class="ph-title">O programa <em>em números.</em></div>
+      <div class="ph-sub">Fevereiro 2026</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="tabs" style="margin-bottom:0">
+        <div class="tab active">Este mês</div>
+        <div class="tab">Últimos 3 meses</div>
+        <div class="tab">Este ano</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+    <div class="sc" style="cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''" onclick="nav('analytics', document.querySelectorAll('.s-item')[3])">
+      <div class="sc-num">142</div>
+      <div class="sc-label">Indicações</div>
+      <div class="sc-delta">↑ +24% vs jan</div>
+    </div>
+    <div class="sc hero" style="cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''" onclick="nav('analytics', document.querySelectorAll('.s-item')[3])">
+      <div class="sc-num">68%</div>
+      <div class="sc-label">Conversão</div>
+      <div class="sc-delta">↑ +5 pts vs jan</div>
+    </div>
+    <div class="sc" style="cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''" onclick="nav('analytics', document.querySelectorAll('.s-item')[3])">
+      <div class="sc-num">97</div>
+      <div class="sc-label">Novos alunos via indicação</div>
+      <div class="sc-delta">↑ +18 vs jan</div>
+    </div>
+    <div class="sc" style="cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(0,0,0,.1)'" onmouseout="this.style.transform='';this.style.boxShadow=''" onclick="nav('analytics', document.querySelectorAll('.s-item')[3])">
+      <div class="sc-num">R$14.500</div>
+      <div class="sc-label">Receita atribuída</div>
+      <div class="sc-delta">↑ +22%</div>
+    </div>
+  </div>
+
+  <div class="two-col" style="margin-bottom:16px">
+    <div>
+      <div class="sec-title">Indicações por mês</div>
+      <div class="card">
+        <div style="padding:20px">
+          <div class="chart-wrap">
+            <div class="bar" style="height:40%"></div>
+            <div class="bar" style="height:55%"></div>
+            <div class="bar" style="height:45%"></div>
+            <div class="bar" style="height:65%"></div>
+            <div class="bar" style="height:50%"></div>
+            <div class="bar" style="height:70%"></div>
+            <div class="bar" style="height:60%"></div>
+            <div class="bar" style="height:80%"></div>
+            <div class="bar" style="height:72%"></div>
+            <div class="bar" style="height:88%"></div>
+            <div class="bar" style="height:95%"></div>
+            <div class="bar active" style="height:100%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px">
+            <span style="font-size:10px;color:var(--faint)">Mar</span>
+            <span style="font-size:10px;color:var(--faint)">Abr</span>
+            <span style="font-size:10px;color:var(--faint)">Mai</span>
+            <span style="font-size:10px;color:var(--faint)">Jun</span>
+            <span style="font-size:10px;color:var(--faint)">Jul</span>
+            <span style="font-size:10px;color:var(--faint)">Ago</span>
+            <span style="font-size:10px;color:var(--faint)">Set</span>
+            <span style="font-size:10px;color:var(--faint)">Out</span>
+            <span style="font-size:10px;color:var(--faint)">Nov</span>
+            <span style="font-size:10px;color:var(--faint)">Dez</span>
+            <span style="font-size:10px;color:var(--faint)">Jan</span>
+            <span style="font-size:10px;color:var(--orange);font-weight:700">Fev</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sec-title">Taxa de conversão</div>
+      <div class="card">
+        <div style="padding:20px">
+          <div class="chart-wrap" style="align-items:flex-end">
+            <div class="bar" style="height:50%;background:var(--teal)"></div>
+            <div class="bar" style="height:58%;background:var(--teal)"></div>
+            <div class="bar" style="height:54%;background:var(--teal)"></div>
+            <div class="bar" style="height:62%;background:var(--teal)"></div>
+            <div class="bar" style="height:55%;background:var(--teal)"></div>
+            <div class="bar" style="height:60%;background:var(--teal)"></div>
+            <div class="bar" style="height:58%;background:var(--teal)"></div>
+            <div class="bar" style="height:63%;background:var(--teal)"></div>
+            <div class="bar" style="height:59%;background:var(--teal)"></div>
+            <div class="bar" style="height:61%;background:var(--teal)"></div>
+            <div class="bar" style="height:63%;background:var(--teal)"></div>
+            <div class="bar active" style="height:68%;background:var(--green)"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px">
+            <span style="font-size:10px;color:var(--faint)">Mar</span>
+            <span style="font-size:10px;color:var(--faint)">Abr</span>
+            <span style="font-size:10px;color:var(--faint)">Mai</span>
+            <span style="font-size:10px;color:var(--faint)">Jun</span>
+            <span style="font-size:10px;color:var(--faint)">Jul</span>
+            <span style="font-size:10px;color:var(--faint)">Ago</span>
+            <span style="font-size:10px;color:var(--faint)">Set</span>
+            <span style="font-size:10px;color:var(--faint)">Out</span>
+            <span style="font-size:10px;color:var(--faint)">Nov</span>
+            <span style="font-size:10px;color:var(--faint)">Dez</span>
+            <span style="font-size:10px;color:var(--faint)">Jan</span>
+            <span style="font-size:10px;color:var(--green);font-weight:700">Fev</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="sec-title">Performance por embaixadora</div>
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Embaixador</th>
+            <th>Indicações</th>
+            <th>Convertidas</th>
+            <th>Taxa</th>
+            <th>Receita gerada</th>
+            <th>Recompensa paga</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--orange)">EM</div>Emma Miller</div></td>
+            <td>14</td><td>9</td>
+            <td><span style="font-weight:700;color:var(--green)">64%</span></td>
+            <td>R$6.750</td><td>R$450</td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--teal)">SC</div>Sarah Chen</div></td>
+            <td>9</td><td>6</td>
+            <td><span style="font-weight:700;color:var(--green)">67%</span></td>
+            <td>R$4.500</td><td>R$300</td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--green)">AL</div>Ana Lima</div></td>
+            <td>7</td><td>5</td>
+            <td><span style="font-weight:700;color:var(--green)">71%</span></td>
+            <td>R$3.750</td><td>R$250</td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:#e11d48">PR</div>Paula Rocha</div></td>
+            <td>4</td><td>2</td>
+            <td><span style="font-weight:700;color:var(--muted)">50%</span></td>
+            <td>R$1.500</td><td>R$100</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ RECOMPENSAS ══ -->
+<div class="page" id="page-recompensas">
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-label">Recompensas</div>
+      <div class="ph-title">O que seus <em>embaixadores ganham.</em></div>
+      <div class="ph-sub">Configure os tipos de recompensa e acompanhe o histórico de pagamentos.</div>
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="openNovaRecompensa()">
+      <svg width="13" height="13" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5v12M5 11h12" stroke-linecap="round"/></svg>
+      Nova recompensa
+    </button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="tabRecomp('tipos',this)">Tipos de recompensa</div>
+    <div class="tab" onclick="tabRecomp('historico',this)">Histórico de pagamentos</div>
+    <div class="tab" onclick="tabRecomp('pendentes',this)">Pendentes (3)</div>
+  </div>
+
+  <!-- TAB: Tipos -->
+  <div id="recomp-tipos">
+    <div class="three-col" style="margin-bottom:28px">
+      <div class="reward-card">
+        <div class="rc-icon" style="background:var(--orange-lt)">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="var(--orange)" stroke-width="1.6"><circle cx="11" cy="11" r="9"/><path d="M11 7v8M8 10h6" stroke-linecap="round"/></svg>
+        </div>
+        <div class="rc-title">Desconto na mensalidade</div>
+        <div class="rc-desc">O embaixador recebe desconto de R$50 na próxima mensalidade a cada novo indicado convertido.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span class="rc-badge" style="background:var(--orange-lt);color:var(--orange)">R$50 por conversão</span>
+          <span class="tag tag-teal" style="cursor:pointer" onclick="showToast('Recompensa pausada!')">Ativo</span>
+        </div>
+      </div>
+      <div class="reward-card">
+        <div class="rc-icon" style="background:var(--green-lt)">
+          <svg width="20" height="20" viewBox="0 0 22 22" fill="none" stroke="var(--green)" stroke-width="1.6"><rect x="3" y="8" width="16" height="11" rx="2"/><path d="M7 8V6a4 4 0 018 0v2" stroke-linecap="round"/><circle cx="11" cy="13" r="1.5" fill="var(--green)"/></svg>
+        </div>
+        <div class="rc-title">Aula grátis</div>
+        <div class="rc-desc">O embaixador ganha uma aula avulsa grátis para usar quando quiser. Sem prazo de validade.</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span class="rc-badge" style="background:var(--green-lt);color:var(--green)">1 aula por conversão</span>
+          <span class="tag tag-teal" style="cursor:pointer" onclick="showToast('Recompensa pausada!')">Ativo</span>
+        </div>
+      </div>
+      <div class="reward-card" style="border:1.5px dashed rgba(0,0,0,.12);background:var(--cream2);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;min-height:160px" onclick="openNovaRecompensa()">
+        <div style="width:36px;height:36px;border-radius:10px;background:var(--cream3);display:flex;align-items:center;justify-content:center;margin-bottom:10px">
+          <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="var(--muted)" stroke-width="1.6"><path d="M11 5v12M5 11h12" stroke-linecap="round"/></svg>
+        </div>
+        <div style="font-size:13px;font-weight:700;color:var(--muted)">Adicionar recompensa</div>
+        <div style="font-size:12px;color:var(--faint);margin-top:4px">Pix, voucher, produto</div>
+      </div>
+    </div>
+
+    <div class="sec-title">Histórico recente</div>
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr><th>Embaixador</th><th>Indicado convertido</th><th>Recompensa</th><th>Valor</th><th>Data</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--orange)">EM</div>Emma Miller</div></td>
+            <td>Sophie Ward</td><td>Desconto mensalidade</td>
+            <td><span style="font-weight:700">R$50</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">Pendente</span></td>
+            <td><button class="btn btn-approve btn-sm" onclick="pagar(this)">Pagar</button></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--green)">AL</div>Ana Lima</div></td>
+            <td>Carla Dias</td><td>Aula grátis</td>
+            <td><span style="font-weight:700">1 aula</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">Ontem</span></td>
+            <td><span class="tag tag-green">Pago</span></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--teal)">SC</div>Sarah Chen</div></td>
+            <td>Julia Neves</td><td>Desconto mensalidade</td>
+            <td><span style="font-weight:700">R$50</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">17 fev</span></td>
+            <td><span class="tag tag-green">Pago</span></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:#e11d48">PR</div>Paula Rocha</div></td>
+            <td>Fernanda Costa</td><td>Aula grátis</td>
+            <td><span style="font-weight:700">1 aula</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">Pendente</span></td>
+            <td><button class="btn btn-approve btn-sm" onclick="pagar(this)">Pagar</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: Histórico completo -->
+  <div id="recomp-historico" style="display:none">
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr><th>Embaixador</th><th>Indicado convertido</th><th>Recompensa</th><th>Valor</th><th>Data</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--green)">AL</div>Ana Lima</div></td>
+            <td>Carla Dias</td><td>Aula grátis</td>
+            <td><span style="font-weight:700">1 aula</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">Ontem</span></td>
+            <td><span class="tag tag-green">Pago</span></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--teal)">SC</div>Sarah Chen</div></td>
+            <td>Julia Neves</td><td>Desconto mensalidade</td>
+            <td><span style="font-weight:700">R$50</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">17 fev</span></td>
+            <td><span class="tag tag-green">Pago</span></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--orange)">EM</div>Emma Miller</div></td>
+            <td>Beatriz Alves</td><td>Desconto mensalidade</td>
+            <td><span style="font-weight:700">R$50</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">14 fev</span></td>
+            <td><span class="tag tag-green">Pago</span></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--green)">AL</div>Ana Lima</div></td>
+            <td>Priya Singh</td><td>Aula grátis</td>
+            <td><span style="font-weight:700">1 aula</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">16 fev</span></td>
+            <td><span class="tag tag-green">Pago</span></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--teal)">SC</div>Sarah Chen</div></td>
+            <td>Marina Souza</td><td>Desconto mensalidade</td>
+            <td><span style="font-weight:700">R$50</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">15 fev</span></td>
+            <td><span class="tag tag-green">Pago</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB: Pendentes -->
+  <div id="recomp-pendentes" style="display:none">
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr><th>Embaixador</th><th>Indicado convertido</th><th>Recompensa</th><th>Valor</th><th>Aguardando desde</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--orange)">EM</div>Emma Miller</div></td>
+            <td>Sophie Ward</td><td>Desconto mensalidade</td>
+            <td><span style="font-weight:700">R$50</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">Hoje</span></td>
+            <td><button class="btn btn-approve btn-sm" onclick="pagar(this)">Pagar</button></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:#e11d48">PR</div>Paula Rocha</div></td>
+            <td>Fernanda Costa</td><td>Aula grátis</td>
+            <td><span style="font-weight:700">1 aula</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">Ontem</span></td>
+            <td><button class="btn btn-approve btn-sm" onclick="pagar(this)">Pagar</button></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:8px"><div class="av av-sm" style="background:var(--teal)">SC</div>Sarah Chen</div></td>
+            <td>Mike Ross</td><td>Desconto mensalidade</td>
+            <td><span style="font-weight:700">R$50</span></td>
+            <td><span style="font-size:12px;color:var(--muted)">Hoje</span></td>
+            <td><button class="btn btn-approve btn-sm" onclick="pagar(this)">Pagar</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════ CONFIGURAÇÕES ══ -->
+<div class="page" id="page-configuracoes">
+
+  <div class="ph">
+    <div class="ph-left">
+      <div class="ph-label">Configurações</div>
+      <div class="ph-title">Configure o programa <em>e o estúdio.</em></div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:200px 1fr;gap:24px;align-items:start">
+
+    <!-- Sidebar de configurações -->
+    <div style="background:var(--white);border:1px solid var(--border);border-radius:16px;overflow:hidden;box-shadow:var(--shadow-sm)">
+      <div class="cfg-nav-item active" onclick="cfgTab('perfil',this)">Perfil do Estúdio</div>
+      <div class="cfg-nav-item" onclick="cfgTab('programa',this)">Programa de Indicação</div>
+      <div class="cfg-nav-item" onclick="cfgTab('notif',this)">Notificações</div>
+      <div class="cfg-nav-item" onclick="cfgTab('faturamento',this)">Faturamento</div>
+      <div class="cfg-nav-item" style="color:var(--red)" onclick="cfgTab('perigo',this)">Ações avançadas</div>
+    </div>
+
+    <!-- Conteúdo -->
+    <div>
+
+      <!-- PERFIL -->
+      <div id="cfg-perfil">
+        <div style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--ink);margin-bottom:4px">Perfil do Estúdio</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Essas informações aparecem nos e-mails de recompensa e na sua página de indicação para alunos.</div>
+        <div class="card">
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Nome do estúdio</div>
+              <div class="cfg-row-desc">Aparece em todos os e-mails enviados e na sua página de indicação.</div>
+            </div>
+            <input class="input" style="max-width:260px" type="text" value="Espaço Zélos">
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">E-mail do proprietário</div>
+              <div class="cfg-row-desc">Usado para login, recibos de cobrança e alertas do sistema.</div>
+            </div>
+            <input class="input" style="max-width:260px" type="email" value="contato@espacozelos.com.br">
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Fuso horário do estúdio</div>
+              <div class="cfg-row-desc">Usado para relatórios, e-mails agendados e rastreamento de metas.</div>
+            </div>
+            <select class="input" style="max-width:260px">
+              <option selected>America/Sao_Paulo (UTC-3)</option>
+              <option>America/New_York (UTC-5)</option>
+              <option>Europe/Lisbon (UTC+0)</option>
+            </select>
+          </div>
+          <div class="cfg-row" style="border-bottom:none">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Idioma padrão</div>
+              <div class="cfg-row-desc">Idioma dos e-mails para alunos e da página de indicação.</div>
+            </div>
+            <select class="input" style="max-width:260px">
+              <option selected>Português (BR)</option>
+              <option>English</option>
+              <option>Español</option>
+            </select>
+          </div>
+          <div style="padding:16px 24px;background:var(--cream2);border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+            <button class="btn btn-primary btn-sm" onclick="showToast('Perfil do estúdio salvo!')">Salvar Alterações</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROGRAMA -->
+      <div id="cfg-programa" style="display:none">
+        <div style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--ink);margin-bottom:4px">Programa de Indicação</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Configure as regras e o link do seu programa.</div>
+        <div class="card">
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Status do programa</div>
+              <div class="cfg-row-desc">Ativar ou pausar o recebimento de novas indicações.</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span class="tag tag-teal" id="prog-status-tag2">Ativo</span>
+              <div class="toggle" id="prog-toggle2" onclick="togglePrograma2()"></div>
+            </div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Nome do programa</div>
+              <div class="cfg-row-desc">Como o programa aparece para as embaixadoras.</div>
+            </div>
+            <input class="input" style="max-width:260px" type="text" value="Indica Zélos">
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Link do programa</div>
+              <div class="cfg-row-desc">Link de indicação: <strong>espacozelos.ambassi.club/{nome da aluna}</strong></div>
+            </div>
+            <div class="input-group" style="max-width:260px">
+              <span class="ig-prefix">espacozelos</span>
+              <span class="ig-prefix" style="background:var(--white);border-left:none;color:var(--muted)">.ambassi.club</span>
+            </div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Aprovação manual</div>
+              <div class="cfg-row-desc">Você aprova cada indicação antes da recompensa ser liberada.</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="cfg-row" style="border-bottom:none">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Mensagem para a embaixadora</div>
+              <div class="cfg-row-desc">Aparece no e-mail de convite para o programa.</div>
+            </div>
+            <textarea class="input" rows="3" style="max-width:260px;resize:none;line-height:1.6">Obrigado por fazer parte do Espaço Zélos! Compartilhe seu link e ganhe recompensas quando as pessoas que você indicar se tornarem alunas.</textarea>
+          </div>
+          <div style="padding:16px 24px;background:var(--cream2);border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+            <button class="btn btn-primary btn-sm" onclick="showToast('Programa salvo!')">Salvar Alterações</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICAÇÕES -->
+      <div id="cfg-notif" style="display:none">
+        <div style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--ink);margin-bottom:4px">Notificações</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Escolha quando receber avisos por e-mail.</div>
+        <div class="card">
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Nova indicação</div>
+              <div class="cfg-row-desc">Aviso quando um embaixador compartilhar o link</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Nova conversão</div>
+              <div class="cfg-row-desc">Aviso quando uma indicação se tornar aluno</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Resumo semanal</div>
+              <div class="cfg-row-desc">Resumo de performance toda segunda-feira</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="cfg-row" style="border-bottom:none">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label">Aprovação pendente há 48h</div>
+              <div class="cfg-row-desc">Lembrete quando houver indicações esperando</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div style="padding:16px 24px;background:var(--cream2);border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+            <button class="btn btn-primary btn-sm" onclick="showToast('Notificações salvas!')">Salvar Alterações</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FATURAMENTO -->
+      <div id="cfg-faturamento" style="display:none">
+        <div style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--ink);margin-bottom:4px">Faturamento</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Seu plano atual e histórico de cobranças.</div>
+        <div class="card" style="margin-bottom:16px">
+          <div style="padding:24px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:4px">Plano atual</div>
+              <div style="font-family:var(--serif);font-style:italic;font-size:28px;color:var(--ink);line-height:1">Pro <span style="font-size:14px;color:var(--muted);font-family:var(--sans);font-style:normal">R$97/mês</span></div>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px">Próxima cobrança: 19 mar 2026</div>
+            </div>
+            <span class="tag tag-orange">Pro</span>
+          </div>
+          <div style="padding:20px 24px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12px;color:var(--ink);display:flex;align-items:center;gap:6px"><span style="color:var(--green);font-weight:800">✓</span>Embaixadores ilimitados</div>
+            <div style="font-size:12px;color:var(--ink);display:flex;align-items:center;gap:6px"><span style="color:var(--green);font-weight:800">✓</span>Analytics completo</div>
+            <div style="font-size:12px;color:var(--ink);display:flex;align-items:center;gap:6px"><span style="color:var(--green);font-weight:800">✓</span>Recompensas personalizadas</div>
+            <div style="font-size:12px;color:var(--ink);display:flex;align-items:center;gap:6px"><span style="color:var(--green);font-weight:800">✓</span>Link personalizado ambassi.club</div>
+          </div>
+          <div style="padding:16px 24px;background:var(--cream2);border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Gerenciando método de pagamento...')">Alterar pagamento</button>
+            <button class="btn btn-secondary btn-sm" style="color:var(--red)" onclick="showToast('Entre em contato para cancelar: suporte@ambassi.com')">Cancelar plano</button>
+          </div>
+        </div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:18px;color:var(--ink);margin-bottom:12px">Histórico de cobranças</div>
+        <div class="card">
+          <table class="table">
+            <thead><tr><th>Data</th><th>Descrição</th><th>Valor</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span style="font-size:12px;color:var(--muted)">19 fev 2026</span></td><td>Plano Pro</td><td><span style="font-weight:700">R$97</span></td><td><span style="font-size:12px;color:var(--orange);cursor:pointer" onclick="showToast('Recibo enviado para seu e-mail!')">Recibo</span></td></tr>
+              <tr><td><span style="font-size:12px;color:var(--muted)">19 jan 2026</span></td><td>Plano Pro</td><td><span style="font-weight:700">R$97</span></td><td><span style="font-size:12px;color:var(--orange);cursor:pointer" onclick="showToast('Recibo enviado para seu e-mail!')">Recibo</span></td></tr>
+              <tr><td><span style="font-size:12px;color:var(--muted)">19 dez 2025</span></td><td>Plano Pro</td><td><span style="font-weight:700">R$97</span></td><td><span style="font-size:12px;color:var(--orange);cursor:pointer" onclick="showToast('Recibo enviado para seu e-mail!')">Recibo</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ZONA DE PERIGO -->
+      <div id="cfg-perigo" style="display:none">
+        <div style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--red);margin-bottom:4px">Ações avançadas</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:24px">Ações irreversíveis. Tenha certeza antes de continuar.</div>
+        <div class="card" style="border-color:rgba(220,38,38,.2)">
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label" style="color:var(--red)">Exportar todos os dados</div>
+              <div class="cfg-row-desc">Baixar um arquivo CSV com todas as indicações, alunos e recompensas.</div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="showToast('Exportação iniciada. Você receberá o arquivo por e-mail.')">Exportar dados</button>
+          </div>
+          <div class="cfg-row">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label" style="color:var(--red)">Pausar o programa</div>
+              <div class="cfg-row-desc">Novas indicações não serão aceitas até você reativar.</div>
+            </div>
+            <button class="btn btn-sm" style="background:var(--red-lt);color:var(--red)" onclick="showToast('Programa pausado.')">Pausar programa</button>
+          </div>
+          <div class="cfg-row" style="border-bottom:none">
+            <div class="cfg-row-left">
+              <div class="cfg-row-label" style="color:var(--red)">Deletar conta</div>
+              <div class="cfg-row-desc">Remove permanentemente todos os dados. Esta ação não pode ser desfeita.</div>
+            </div>
+            <button class="btn btn-sm" style="background:var(--red);color:#fff" onclick="showToast('Entre em contato com suporte@ambassi.com para deletar sua conta.')">Deletar conta</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<script>
+const periodData = {
+  mes: {
+    label: 'Fevereiro 2026',
+    num: '12', receita: 'R$4.800 em receita nova',
+    conversao: '68%', convDelta: '↑ +5pts',
+    indicacoes: '142', indDelta: '↑ +24%',
+    embaixadores: '12', embDelta: '↑ +3 novos',
+    topLabel: 'Melhor embaixador do mês',
+    topStats: '14 indicações, 9 convertidas.',
+    sarahStats: '9 indicações · 6 conversões',
+    anaStats: '7 indicações · 5 conversões',
+    paulaStats: '4 indicações · 2 conversões',
+  },
+  ano: {
+    label: '2026',
+    num: '97', receita: 'R$38.800 em receita nova',
+    conversao: '65%', convDelta: '↑ +3pts vs 2025',
+    indicacoes: '1.142', indDelta: '↑ +31% vs 2025',
+    embaixadores: '18', embDelta: '↑ +6 novos',
+    topLabel: 'Melhor embaixador do ano',
+    topStats: '84 indicações, 54 convertidas.',
+    sarahStats: '61 indicações · 38 conversões',
+    anaStats: '48 indicações · 33 conversões',
+    paulaStats: '29 indicações · 14 conversões',
+  },
+  historico: {
+    label: 'Desde sempre',
+    num: '284', receita: 'R$113.600 em receita gerada',
+    conversao: '62%', convDelta: 'Taxa acumulada',
+    indicacoes: '1.284', indDelta: 'Total',
+    embaixadores: '24', embDelta: 'Total de embaixadores',
+    topLabel: 'Melhor embaixador de sempre',
+    topStats: '214 indicações, 134 convertidas.',
+    sarahStats: '178 indicações · 108 conversões',
+    anaStats: '142 indicações · 91 conversões',
+    paulaStats: '98 indicações · 52 conversões',
+  }
+}
+
+const dias = ["Domingo","Segunda-feira","Terça-feira","Quarta-feira","Quinta-feira","Sexta-feira","Sábado"]
+const meses = ["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"]
+const hoje = new Date()
+document.getElementById("data-hoje").textContent = dias[hoje.getDay()] + ", " + hoje.getDate() + " de " + meses[hoje.getMonth()]
+
+function setPeriod(period, el) {
+  document.querySelectorAll('#period-tabs .tab').forEach(t => t.classList.remove('active'))
+  el.classList.add('active')
+  const d = periodData[period]
+  document.getElementById('hero-period-label').textContent = d.label
+  document.getElementById('hero-num').textContent = d.num
+  document.getElementById('hero-receita').textContent = d.receita
+  document.getElementById('hero-conversao').textContent = d.conversao
+  document.getElementById('hero-conv-delta').textContent = d.convDelta
+  document.getElementById('hero-indicacoes').textContent = d.indicacoes
+  document.getElementById('hero-ind-delta').textContent = d.indDelta
+  document.getElementById('hero-embaixadores').textContent = d.embaixadores
+  document.getElementById('hero-emb-delta').textContent = d.embDelta
+  document.getElementById('top-period-label').textContent = d.topLabel
+  document.getElementById('top-stats').textContent = d.topStats
+  document.getElementById('sarah-stats').textContent = d.sarahStats
+  document.getElementById('ana-stats').textContent = d.anaStats
+  document.getElementById('paula-stats').textContent = d.paulaStats
+}
+
+function nav(page, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.s-item').forEach(i => i.classList.remove('active'))
+  document.getElementById('page-' + page).classList.add('active')
+  if (el) el.classList.add('active')
+  window.scrollTo(0,0)
+}
+
+document.querySelectorAll('.toggle').forEach(t => {
+  t.addEventListener('click', () => t.classList.toggle('off'))
+})
+
+document.querySelectorAll('.tabs .tab').forEach(tab => {
+  tab.addEventListener('click', function() {
+    this.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+    this.classList.add('active')
+  })
+})
+
+document.querySelectorAll('.filter-tag').forEach(tag => {
+  tag.addEventListener('click', function() {
+    this.closest('.filter-row').querySelectorAll('.filter-tag').forEach(t => t.classList.remove('active'))
+    this.classList.add('active')
+  })
+})
+
+function showToast(msg) {
+  const t = document.createElement('div')
+  t.textContent = msg
+  t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#111010;color:#fff;padding:12px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.2);transition:opacity .3s'
+  document.body.appendChild(t)
+  setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(),300) }, 2400)
+}
+
+function aprovar(btn) {
+  const row = btn.closest('tr')
+  const statusCell = row.querySelector('.tag')
+  statusCell.className = 'tag tag-green'
+  statusCell.textContent = 'Aprovada'
+  btn.closest('div').innerHTML = '<span style="font-size:12px;color:var(--faint)">Recompensa pendente</span>'
+  showToast('Indicação aprovada! Recompensa adicionada à fila.')
+}
+
+function revisar(btn) {
+  showToast('Marcado para revisão. Você receberá um lembrete amanhã.')
+}
+
+function aprovarTodas() {
+  document.querySelectorAll('#page-aprovacoes .tag-orange').forEach(tag => {
+    tag.className = 'tag tag-green'
+    tag.textContent = 'Aprovada'
+  })
+  document.querySelectorAll('#page-aprovacoes .btn-approve, #page-aprovacoes .btn-review').forEach(b => b.remove())
+  showToast('5 indicações aprovadas! Recompensas adicionadas à fila.')
+}
+
+function aprovarHome(btn) {
+  const item = btn.closest('.feed-item')
+  btn.remove()
+  item.querySelector('.fi-sub').style.color = 'var(--green)'
+  showToast('Indicação aprovada!')
+}
+
+function toggleNotif(e) {
+  if (e) e.stopPropagation()
+  const d = document.getElementById('notif-dropdown')
+  d.style.display = d.style.display === 'none' ? 'block' : 'none'
+}
+
+function marcarTodasLidas() {
+  document.querySelectorAll('.notif-item.unread').forEach(n => n.classList.remove('unread'))
+  document.querySelector('#bell-wrap div:last-child') 
+  const badge = document.querySelector('#bell-wrap > div:nth-child(2)')
+  if (badge) badge.style.display = 'none'
+  showToast('Todas as notificações marcadas como lidas.')
+}
+
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('bell-wrap')
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('notif-dropdown').style.display = 'none'
+  }
+})
+
+
+const embaixadores = {
+  emma: {
+    nome: 'Emma Miller', iniciais: 'EM', cor: 'var(--orange)',
+    email: 'emma@email.com', tel: '+55 11 91234-5678',
+    membro: 'Membro desde mar 2025', status: 'Ativo',
+    ind: 14, conv: 9, pct: '64%', recomp: 'R$450',
+    receita: 'R$6.750',
+    historico: [
+      {nome:'Sophie Ward', data:'Hoje, 14:23', pacote:'Pacote mensal', status:'Pendente', cor:'tag-orange'},
+      {nome:'Carla Dias', data:'Ontem, 09:12', pacote:'Pacote mensal', status:'Convertida', cor:'tag-green'},
+      {nome:'Julia Neves', data:'17 fev', pacote:'Aula avulsa', status:'Convertida', cor:'tag-green'},
+      {nome:'Beatriz Alves', data:'14 fev', pacote:'Pacote trimestral', status:'Convertida', cor:'tag-green'},
+      {nome:'Renata Lima', data:'10 fev', pacote:'Pacote mensal', status:'Não convertida', cor:'tag-neutral'},
+    ],
+    recompensas: [
+      {tipo:'Desconto mensalidade', valor:'R$50', data:'Pendente', status:'tag-orange'},
+      {tipo:'Desconto mensalidade', valor:'R$50', data:'17 fev', status:'tag-green'},
+      {tipo:'Aula grátis', valor:'1 aula', data:'10 fev', status:'tag-green'},
+    ]
+  },
+  sarah: {
+    nome: 'Sarah Chen', iniciais: 'SC', cor: 'var(--teal)',
+    email: 'sarah@email.com', tel: '+55 11 92345-6789',
+    membro: 'Membro desde abr 2025', status: 'Ativo',
+    ind: 9, conv: 6, pct: '67%', recomp: 'R$300',
+    receita: 'R$4.500',
+    historico: [
+      {nome:'Mike Ross', data:'Hoje, 11:05', pacote:'Aula avulsa', status:'Pendente', cor:'tag-orange'},
+      {nome:'Julia Neves', data:'17 fev', pacote:'Aula avulsa', status:'Convertida', cor:'tag-green'},
+      {nome:'Carla Dias', data:'15 fev', pacote:'Pacote mensal', status:'Convertida', cor:'tag-green'},
+      {nome:'Marina Souza', data:'11 fev', pacote:'Pacote mensal', status:'Convertida', cor:'tag-green'},
+    ],
+    recompensas: [
+      {tipo:'Desconto mensalidade', valor:'R$50', data:'17 fev', status:'tag-green'},
+      {tipo:'Desconto mensalidade', valor:'R$50', data:'15 fev', status:'tag-green'},
+      {tipo:'Aula grátis', valor:'1 aula', data:'11 fev', status:'tag-green'},
+    ]
+  },
+  ana: {
+    nome: 'Ana Lima', iniciais: 'AL', cor: 'var(--green)',
+    email: 'ana@email.com', tel: '+55 11 93456-7890',
+    membro: 'Membro desde mai 2025', status: 'Ativo',
+    ind: 7, conv: 5, pct: '71%', recomp: 'R$250',
+    receita: 'R$3.750',
+    historico: [
+      {nome:'Carla Dias', data:'Ontem, 09:12', pacote:'Pacote mensal', status:'Convertida', cor:'tag-green'},
+      {nome:'Fernanda Costa', data:'Ontem, 16:40', pacote:'Pacote trimestral', status:'Pendente', cor:'tag-orange'},
+      {nome:'Priya Singh', data:'16 fev', pacote:'Pacote mensal', status:'Convertida', cor:'tag-green'},
+      {nome:'Sasha Torres', data:'13 fev', pacote:'Aula avulsa', status:'Convertida', cor:'tag-green'},
+    ],
+    recompensas: [
+      {tipo:'Aula grátis', valor:'1 aula', data:'Ontem', status:'tag-green'},
+      {tipo:'Desconto mensalidade', valor:'R$50', data:'16 fev', status:'tag-green'},
+      {tipo:'Aula grátis', valor:'1 aula', data:'13 fev', status:'tag-green'},
+    ]
+  },
+  paula: {
+    nome: 'Paula Rocha', iniciais: 'PR', cor: '#e11d48',
+    email: 'paula@email.com', tel: '+55 11 94567-8901',
+    membro: 'Membro desde jun 2025', status: 'Ativo',
+    ind: 4, conv: 2, pct: '50%', recomp: 'R$100',
+    receita: 'R$1.500',
+    historico: [
+      {nome:'Fernanda Costa', data:'Ontem, 16:40', pacote:'Pacote trimestral', status:'Pendente', cor:'tag-orange'},
+      {nome:'Rafael Souza', data:'14 fev', pacote:'Pacote mensal', status:'Pendente', cor:'tag-orange'},
+      {nome:'Lucia Andrade', data:'10 fev', pacote:'Aula avulsa', status:'Convertida', cor:'tag-green'},
+      {nome:'Bia Castro', data:'5 fev', pacote:'Pacote mensal', status:'Convertida', cor:'tag-green'},
+    ],
+    recompensas: [
+      {tipo:'Aula grátis', valor:'1 aula', data:'Pendente', status:'tag-orange'},
+      {tipo:'Desconto mensalidade', valor:'R$50', data:'5 fev', status:'tag-green'},
+    ]
+  },
+  lucia: {
+    nome: 'Lucia Mendes', iniciais: 'LM', cor: 'var(--faint)',
+    email: 'lucia@email.com', tel: '+55 11 95678-9012',
+    membro: 'Membro desde jan 2026', status: 'Inativo',
+    ind: 1, conv: 0, pct: '0%', recomp: 'R$0',
+    receita: 'R$0',
+    historico: [
+      {nome:'Claudia Ramos', data:'12 fev', pacote:'Pacote mensal', status:'Não convertida', cor:'tag-neutral'},
+    ],
+    recompensas: []
+  }
+}
+
+function openAluna(key) {
+  const a = embaixadores[key]
+  if (!a) return
+  const histHTML = a.historico.map(h => `
+    <div class="hist-item">
+      <div class="av av-sm" style="background:var(--cream3);color:var(--muted);font-size:9px">${h.nome.split(' ').map(x=>x[0]).join('')}</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--ink)">${h.nome}</div>
+        <div style="font-size:11px;color:var(--muted)">${h.pacote} · ${h.data}</div>
+      </div>
+      <span class="tag ${h.cor}" style="font-size:10px">${h.status}</span>
+    </div>`).join('')
+
+  const recompHTML = a.recompensas.length ? a.recompensas.map(r => `
+    <div class="hist-item">
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:var(--ink)">${r.tipo}</div>
+        <div style="font-size:11px;color:var(--muted)">${r.data}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:13px;font-weight:700">${r.valor}</span>
+        <span class="tag ${r.status}" style="font-size:10px">${r.status === 'tag-green' ? 'Pago' : 'Pendente'}</span>
+      </div>
+    </div>`).join('') : '<div style="font-size:13px;color:var(--faint);padding:8px 0">Nenhuma recompensa ainda.</div>'
+
+  document.getElementById('drawer-content').innerHTML = `
+    <div class="drawer-head">
+      <div style="display:flex;align-items:center;gap:14px">
+        <div class="av" style="background:${a.cor};width:48px;height:48px;font-size:14px">${a.iniciais}</div>
+        <div>
+          <div style="font-family:var(--serif);font-style:italic;font-size:22px;color:var(--ink);line-height:1.1">${a.nome}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${a.membro} · <span class="tag ${a.status === 'Ativo' ? 'tag-teal' : 'tag-neutral'}" style="font-size:10px;padding:2px 8px">${a.status}</span></div>
+        </div>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer()">✕</button>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-label">Contato</div>
+      <div style="font-size:13px;color:var(--ink);margin-bottom:4px">${a.email}</div>
+      <div style="font-size:13px;color:var(--muted)">${a.tel}</div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-label">Performance</div>
+      <div class="drawer-stat-row">
+        <div class="drawer-stat">
+          <div class="drawer-stat-num">${a.ind}</div>
+          <div class="drawer-stat-lbl">Indicações</div>
+        </div>
+        <div class="drawer-stat">
+          <div class="drawer-stat-num">${a.conv}</div>
+          <div class="drawer-stat-lbl">Convertidas</div>
+        </div>
+        <div class="drawer-stat">
+          <div class="drawer-stat-num" style="color:var(--green)">${a.pct}</div>
+          <div class="drawer-stat-lbl">Conversão</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+        <div class="drawer-stat">
+          <div class="drawer-stat-num">${a.recomp}</div>
+          <div class="drawer-stat-lbl">Recompensas</div>
+        </div>
+        <div class="drawer-stat">
+          <div class="drawer-stat-num" style="color:var(--orange)">${a.receita}</div>
+          <div class="drawer-stat-lbl">Receita gerada</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-label">Histórico de indicações</div>
+      ${histHTML}
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-label">Recompensas</div>
+      ${recompHTML}
+    </div>
+
+    <div class="drawer-section">
+      <div class="drawer-label">Ações</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary btn-sm" onclick="nav('recompensas', document.querySelectorAll('.s-item')[4]);closeDrawer();showToast('Criando recompensa para ${a.nome}...')">Criar recompensa</button>
+        <button class="btn btn-secondary btn-sm" onclick="showToast('Link de ${a.nome} copiado!')">Copiar link dele</button>
+        <button class="btn btn-secondary btn-sm" onclick="showToast('Mensagem enviada para ${a.nome}!')">Enviar mensagem</button>
+      </div>
+    </div>
+  `
+
+  const overlay = document.getElementById('drawer-overlay')
+  const drawer = document.getElementById('student-drawer')
+  overlay.style.display = 'block'
+  drawer.style.display = 'block'
+  requestAnimationFrame(() => { drawer.style.transform = 'translateX(0)' })
+}
+
+function closeDrawer() {
+  const drawer = document.getElementById('student-drawer')
+  drawer.style.transform = 'translateX(100%)'
+  setTimeout(() => {
+    drawer.style.display = 'none'
+    document.getElementById('drawer-overlay').style.display = 'none'
+  }, 250)
+}
+
+function cfgTab(tab, el) {
+  document.querySelectorAll('.cfg-nav-item').forEach(i => i.classList.remove('active'))
+  el.classList.add('active')
+  const sections = ['perfil','programa','notif','faturamento','perigo']
+  sections.forEach(s => {
+    const el2 = document.getElementById('cfg-' + s)
+    if (el2) el2.style.display = s === tab ? '' : 'none'
+  })
+}
+
+function togglePrograma2() {
+  const tog = document.getElementById('prog-toggle2')
+  const tag = document.getElementById('prog-status-tag2')
+  const isOn = !tog.classList.contains('off')
+  tog.classList.toggle('off')
+  if (isOn) { tag.className = 'tag tag-neutral'; tag.textContent = 'Pausado'; showToast('Programa pausado.') }
+  else { tag.className = 'tag tag-teal'; tag.textContent = 'Ativo'; showToast('Programa ativado!') }
+}
+
+function openNovaRecompensa() {
+  document.getElementById('modal-overlay').style.display = 'flex'
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return
+  document.getElementById('modal-overlay').style.display = 'none'
+}
+
+function selectTipo(el, tipo) {
+  document.querySelectorAll('.recomp-type-btn').forEach(b => b.classList.remove('active'))
+  el.classList.add('active')
+  const prefix = document.getElementById('valor-prefix')
+  const input = document.getElementById('input-valor')
+  if (tipo === 'aula') { prefix.textContent = 'Qtd'; input.placeholder = 'ex: 1' }
+  else { prefix.textContent = 'R$'; input.placeholder = 'ex: 50' }
+}
+
+function salvarRecompensa() {
+  document.getElementById('modal-overlay').style.display = 'none'
+  showToast('Recompensa criada e ativada!')
+}
+
+function tabRecomp(tab, el) {
+  document.querySelectorAll('#page-recompensas .tab').forEach(t => t.classList.remove('active'))
+  el.classList.add('active')
+  document.getElementById('recomp-tipos').style.display = tab === 'tipos' ? '' : 'none'
+  document.getElementById('recomp-historico').style.display = tab === 'historico' ? '' : 'none'
+  document.getElementById('recomp-pendentes').style.display = tab === 'pendentes' ? '' : 'none'
+}
+
+function pagar(btn) {
+  const row = btn.closest('tr')
+  const dateCell = row.cells[4]
+  dateCell.innerHTML = '<span style="font-size:12px;color:var(--muted)">Hoje</span>'
+  btn.closest('td').innerHTML = '<span class="tag tag-green">Pago</span>'
+  showToast('Recompensa marcada como paga!')
+}
+</script>
+<style>
+#toast-container { position:fixed;bottom:32px;left:50%;transform:translateX(-50%);z-index:9999 }
+</style>
+
+
+<!-- ══ MODAL NOVA RECOMPENSA ══ -->
+<div id="modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;backdrop-filter:blur(2px);align-items:center;justify-content:center" onclick="closeModal(event)">
+  <div id="modal-box" style="background:var(--white);border-radius:20px;width:520px;max-width:92vw;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <div style="padding:24px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--white);z-index:1">
+      <div>
+        <div style="font-family:var(--serif);font-style:italic;font-size:20px;color:var(--ink)">Nova recompensa</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Crie qualquer tipo de recompensa que fizer sentido pro seu estúdio.</div>
+      </div>
+      <button class="drawer-close" onclick="closeModal()">✕</button>
+    </div>
+    <div style="padding:24px 28px;display:flex;flex-direction:column;gap:16px">
+
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">Nome da recompensa</div>
+        <input class="input" type="text" placeholder="ex: Aula grátis, Desconto no pacote, Voucher de spa..." style="margin-top:6px">
+        <div style="font-size:11px;color:var(--faint);margin-top:5px">Esse nome aparece para o embaixador no e-mail de recompensa.</div>
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">Descrição (opcional)</div>
+        <textarea class="input" rows="2" placeholder="ex: Uma aula avulsa pra usar quando quiser, sem prazo de validade." style="margin-top:6px;resize:none;line-height:1.6"></textarea>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field" style="margin-bottom:0">
+          <div class="field-label">Valor ou quantidade</div>
+          <input class="input" type="text" placeholder="ex: R$50, 1 aula, 20%, produto..." style="margin-top:6px">
+          <div style="font-size:11px;color:var(--faint);margin-top:5px">Pode ser dinheiro, aula, desconto ou qualquer coisa.</div>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field-label">Como será entregue</div>
+          <select class="input" style="margin-top:6px">
+            <option>Desconto na mensalidade</option>
+            <option>Pix direto para o embaixador</option>
+            <option>Aula creditada na conta</option>
+            <option>Voucher enviado por e-mail</option>
+            <option>Produto entregue no estúdio</option>
+            <option>Outro (combinar manualmente)</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field" style="margin-bottom:0">
+          <div class="field-label">Quando é dada</div>
+          <select class="input" style="margin-top:6px">
+            <option>A cada novo indicado convertido</option>
+            <option>A cada 2 indicados convertidos</option>
+            <option>A cada 3 indicados convertidos</option>
+            <option>A cada 5 indicados convertidos</option>
+            <option>Apenas na primeira conversão</option>
+          </select>
+        </div>
+        <div class="field" style="margin-bottom:0">
+          <div class="field-label">Prazo de validade</div>
+          <select class="input" style="margin-top:6px">
+            <option>Sem prazo de validade</option>
+            <option>30 dias após a conversão</option>
+            <option>60 dias após a conversão</option>
+            <option>90 dias após a conversão</option>
+            <option>Até o fim do mês</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <div class="field-label">Regras adicionais (opcional)</div>
+        <textarea class="input" rows="2" placeholder="ex: Válido apenas para alunas que ficarem pelo menos 30 dias. Não acumulável com outras promoções." style="margin-top:6px;resize:none;line-height:1.6"></textarea>
+      </div>
+
+      <div style="background:var(--cream2);border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--ink)">Ativar imediatamente</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">A recompensa já vale para as próximas indicações aprovadas.</div>
+        </div>
+        <div class="toggle" id="toggle-ativar"></div>
+      </div>
+
+    </div>
+    <div style="padding:16px 28px;background:var(--cream2);border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:8px;position:sticky;bottom:0">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-primary btn-sm" onclick="salvarRecompensa()">Criar recompensa</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STUDENT DRAWER ══ -->
+<div id="drawer-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200;backdrop-filter:blur(2px)" onclick="closeDrawer()"></div>
+<div id="student-drawer" style="display:none;position:fixed;top:0;right:0;bottom:0;width:480px;background:var(--white);z-index:201;overflow-y:auto;box-shadow:-8px 0 40px rgba(0,0,0,.12);transform:translateX(100%);transition:transform .25s cubic-bezier(.4,0,.2,1)">
+  <div id="drawer-content"></div>
+</div>
+
+</body>
+</html>
